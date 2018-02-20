@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Vue Line Image Gallery</title>
+  <base href="/">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <style href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css"></style>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #app {
+      background-color: #f1f1f1;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"
+       v-cloak>
+    <div :style="{ 'width': Width + 'px', 'padding': Padding + 'px' }">
+      <div v-for="line in AllLines"
+           :style="{ 'height': Size + 'px', 'margin-bottom': Margin + 'px' }">
+        <div v-for="image in line"
+             :style="image.BoxStyle">
+          <img :src="image.Src"
+               :style="image.ImgStyle" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="utility.js"></script>
+  <script src="images.js"></script>
+  <script>
+    shuffle(images)
+    // images = images.slice(0, 10)
+    const scrollbarWidth = getScrollbarWidth()
+    var app = new Vue({
+      el: '#app',
+      data: {
+        Size: 200,
+        Margin: 10,
+        Padding: 20,
+        BodyWidth: 'auto',
+        Width: 0,
+        AllLines: []
+      },
+      methods: {
+        handleResize: function () {
+          var result = getAllLinesAndWidth(images, scrollbarWidth, this.BodyWidth, this.Margin, this.Padding, this.Size)
+          Vue.set(this, 'Width', result.width)
+          Vue.set(this, 'AllLines', result.allLines)
+        }
+      },
+      mounted: function () {
+        if (this.BodyWidth === 'auto') {
+          window.addEventListener('resize', this.handleResize)
+        }
+        this.handleResize()
+        setTimeout(function () {
+          this.handleResize()
+        }.bind(this))
+      },
+      beforeDestroy: function () {
+        if (this.BodyWidth === 'auto') {
+          window.removeEventListener('resize', this.handleResize)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
